@@ -4,7 +4,7 @@ import "./zombieattack.sol";
 import "./erc721.sol";
 import "./safemath.sol";
 
-contract ZombieOwnership is ZombieAttack, ERC721 {
+contract CryptoZombies is ZombieAttack, ERC721 {
 
   using SafeMath for uint256;
 

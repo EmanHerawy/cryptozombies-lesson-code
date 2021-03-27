@@ -6,8 +6,9 @@
   <title>CryptoZombies front-end</title>
   <script language="javascript" type="text/javascript"
     src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-  <script language="javascript" type="text/javascript" src="web3.min.js"></script>
-  <script language="javascript" type="text/javascript" src="cryptozombies_abi.js"></script>
+  <!-- <script language="javascript" type="text/javascript" src="web3.min.js"></script> -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.2.2/web3.min.js" integrity="sha512-pdidZik9fE+iQvBfA35T1Gb/He8joqptgqiA9uLpIkVl1C3UWv7qYKMlWAcIW72L6P+fK2wMLL7zpzt+oayANg==" crossorigin="anonymous"></script>
+  <script language="javascript" type="text/javascript" src="./cryptozombies_abi.js"></script>
 </head>
 
 <body>
@@ -16,16 +17,17 @@
 
   <script>
     var cryptoZombies;
-    var userAccount;
+    var userAccount ,web3js;
 
     function startApp() {
-      var cryptoZombiesAddress = "YOUR_CONTRACT_ADDRESS";
+      
+      var cryptoZombiesAddress = "0x19550457F532A47f8B64e1246563e9013DF20260";
       cryptoZombies = new web3js.eth.Contract(cryptoZombiesABI, cryptoZombiesAddress);
 
-      var accountInterval = setInterval(function () {
-
-        if (web3.eth.accounts[0] !== userAccount) {
-          userAccount = web3.eth.accounts[0];
+      var accountInterval = setInterval(async function () {
+var accounts = await web3js.eth.getAccounts();
+        if (accounts[0] !== userAccount) {
+          userAccount = accounts[0];
 
           getZombiesByOwner(userAccount)
             .then(displayZombies);
@@ -40,6 +42,7 @@
     }
 
     function displayZombies(ids) {
+      console.log(ids,'ids');
       $("#zombies").empty();
       for (id of ids) {
 
@@ -112,23 +115,33 @@
       return cryptoZombies.methods.zombieToOwner(id).call()
     }
 
-    function getZombiesByOwner(owner) {
-      return cryptoZombies.methods.getZombiesByOwner(owner).call()
+   async function getZombiesByOwner(owner) {
+     console.log(cryptoZombies.methods,'cryptoZombies.methods');
+   return cryptoZombies.methods.getZombiesByOwner(owner).call()
+     
     }
 
     window.addEventListener('load', function () {
-
-
-      if (typeof web3 !== 'undefined') {
+if (typeof window.ethereum !== "undefined") {
+   if(typeof window.ethereum.isMetaMask !== "undefined"){
+    window.ethereum.request({ method: 'eth_requestAccounts' });
+       }
+       console.log(web3.currentProvider,'web3.currentProvider');
+    web3js = new Web3(web3.currentProvider);
+    
+    console.log(web3js,'accounts');
+    startApp()
+  } else if (typeof web3 !== 'undefined') {
 
         web3js = new Web3(web3.currentProvider);
+        startApp()
       } else {
 
 
       }
 
 
-      startApp()
+     
 
     })
   </script>
